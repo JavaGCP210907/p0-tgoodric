@@ -10,7 +10,7 @@ public interface IAccountDao {
 	
 	public void addAccount(int customer_id, String account_type, double balance);
 	
-	public void alterBalance(int account_id, double balance);
+	public void alterBalance(int account_id, double amount);
 	
 	public List<Account> getAccountsByCustomerId(int customer_id);
 }

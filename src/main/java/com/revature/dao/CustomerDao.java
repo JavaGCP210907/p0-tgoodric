@@ -1,6 +1,7 @@
 package com.revature.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,13 +20,31 @@ public class CustomerDao implements ICustomerDao {
 	@Override
 	public void createCustomer() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void closeAccount(int customer_id) {
 		// TODO Auto-generated method stub
-
+		try(Connection conn = ConnectionUtil.getConnection()){
+			
+			
+			String sql = "delete from accounts where customer_id_fk = ?";
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, customer_id);
+			
+			sql = "delete from customers where customer_id = ?";
+			
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, customer_id);
+			
+		}
+		catch (SQLException e) {
+			
+			//TODO: add sane exception handling here, maybe just re-throw
+			//log.error("Failure to remove customer: " + customer_id);
+		}
 	}
 
 	@Override

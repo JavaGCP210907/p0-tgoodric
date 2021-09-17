@@ -1,8 +1,5 @@
 package com.revature.models;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -12,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.revature.dao.AccountDao;
 import com.revature.dao.CustomerDao;
-import com.revature.utils.ConnectionUtil;
 
 public class Menu {
 	
@@ -41,37 +37,28 @@ public class Menu {
 	 */
 	private boolean menuLogic(String selection){ //brace yourself, this is ugly
 		switch(selection.toLowerCase()) { //TODO: Finish switch statement logic in each case including logging
-		case "viewaccounts":{
-			viewAccounts();
+		case "viewaccounts":{ //COMPLETED
+			List<Account> accounts = aDao.getAccounts();
+			viewAccounts(accounts);
 			break;
 		}//end case
-		case "viewcustomers":{
-			viewCustomers(); //
+		case "viewcustomers":{//COMPLETED
+			viewCustomers(); 
 			break;
 		}//end case
 		case "viewaccountinfo":{
 			System.out.println("Select customer: ");
 			System.out.println();
 			viewCustomers();
-			//boolean successful = false;
-			int choice = parseCustomerId();
-			//select
-			if (choice != -1) {
-				try(Connection conn = ConnectionUtil.getConnection()){
-					String sql = "delete from customers where customer_id = ?";
-					
-					PreparedStatement ps = conn.prepareStatement(sql);
-					ps.setInt(1, choice);
-					
-				}
-				catch (SQLException e) {
-					log.error("Failure to remove customer: " + choice);
-				}
+			int choice = parseUserInput();
+			if (choice != -1){
+				
 			}
+			//TODO
 			break;
 		}//end case
 		case "viewcustomerinfo":{ //prints basic customer information, account info, balance
-			System.out.println("customerv");
+			System.out.println("customer");
 			break;
 		}//end case
 		case "newcustomer":{
@@ -84,17 +71,25 @@ public class Menu {
 			break;
 		}//end case
 		case "closeaccounts":{
-			System.out.println("Select customer account to close");
-			int custIdNumber = 0;
-			cDao.closeAccount(custIdNumber);
-			log.warn("Customer " + custIdNumber + " accounts closed");
+			System.out.println("Enter customer id to close accounts");
+			viewCustomers();
+			int choice = parseUserInput();
+			if (choice != -1) {
+				cDao.closeAccount(choice);
+			}
+			else {
+				System.out.println("Invalid selection");
+				log.error("Invalid customer selection: ");
+			}
+			
+			log.warn("Customer " + choice + " accounts closed");
 			break;
 		}//end case
 		case "internaltransfer":{
 			break;
 		}//end case
 		case "withdrawal":{
-			
+			System.out.println("Which ");
 			break;
 		}
 		case "deposit":{
@@ -113,10 +108,10 @@ public class Menu {
 	}//end menuLogic
 
 	/**
-	 * 
+	 * Displays list of accounts
+	 * @param accounts TODO
 	 */
-	private void viewAccounts() {
-		List<Account> accounts = aDao.getAccounts();
+	private void viewAccounts(List<Account> accounts) {
 		for (Account a : accounts) {
 			System.out.println(a);
 		}
@@ -128,10 +123,13 @@ public class Menu {
 	 * Parses out customer ID
 	 * @return int customer id number, or -1 if error occurs
 	 */
-	private int parseCustomerId() {
+	private int parseUserInput() {
 		int choice;
 		try {
 				choice = scan.nextInt();
+				if (choice < 0) {
+					return -1; //error code
+				}
 		}
 		catch(InputMismatchException e){
 			System.out.println("Please enter a numeric value");
@@ -168,7 +166,7 @@ public class Menu {
 		System.out.println();
 		System.out.println("ViewAccounts: View a list of all accounts");
 		System.out.println("ViewCustomers: View a list of all customers");
-		System.out.println("ViewAccountInfo: View a summary of the chosen account");
+		System.out.println("ViewAccountInfo: View a summary of the chosen customer's accounts");
 		System.out.println("ViewCustomerInfo: View a summary of a customer's information");
 		System.out.println("NewCustomer: Creates a new customer");
 		System.out.println("OpenAccount: Create a new account for a customer");
