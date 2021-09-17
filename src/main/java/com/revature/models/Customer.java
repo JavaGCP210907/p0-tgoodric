@@ -114,6 +114,5 @@ public class Customer {
 		this.l_name = l_name;
 	}
 	
-	//getters/setters
 	
 }//end class

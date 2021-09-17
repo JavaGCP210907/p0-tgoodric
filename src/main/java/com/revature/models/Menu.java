@@ -1,19 +1,24 @@
 package com.revature.models;
 
+import java.util.List;
 //import statements
 import java.util.Scanner;
 
-public class Menu {
+import com.revature.dao.CustomerDao;
 
+public class Menu {
 	
-	public static void runMenu() {
-		Scanner sc = new Scanner(System.in);
+	CustomerDao cDao = new CustomerDao();
+	
+	public void runMenu() {
+		Scanner scan = new Scanner(System.in);
 		boolean done = false;
+		//displayMenuText();
 		while(!done) {
 			displayMenuText(); //moved to separate function for aesthetics
-			done = menuLogic(sc.nextLine());  //likewise
+			done = menuLogic(scan.nextLine());  //likewise
 		}//end while
-		sc.close();
+		scan.close();
 	} //end runMenu()
 	
 	/**
@@ -23,18 +28,25 @@ public class Menu {
 	 * @param selection String
 	 * @return boolean
 	 */
-	private static boolean menuLogic(String selection){
+	private boolean menuLogic(String selection){
 		switch(selection.toLowerCase()) { //TODO: Finish switch statement logic in each case including logging
 		case "viewaccounts":{
 			break;
 		}//end case
-		case "viewcustomers:":{
+		case "viewcustomers":{
+			List<Customer> customers = cDao.getCustomers();
+			for (Customer c : customers) {
+				System.out.println(c);
+			}
+			
+			System.out.println();
 			break;
 		}//end case
 		case "viewaccountinfo":{
 			break;
 		}//end case
-		case "viewcustomerinfo:":{
+		case "viewcustomerinfo":{
+			System.out.println("customerv");
 			break;
 		}//end case
 		case "newcustomer":{
@@ -72,7 +84,7 @@ public class Menu {
 	 * prints the menu text, moved to separate function
 	 * for aesthetic purposes
 	 */
-	private static void displayMenuText() {
+	private void displayMenuText() {
 		System.out.println("================================================");
 		System.out.println("Welcome to Revature FCU Account Mangement System");
 		System.out.println("================================================");
