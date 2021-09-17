@@ -32,4 +32,7 @@ dependencies {
     
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+	
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
 }
