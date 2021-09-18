@@ -14,34 +14,56 @@ import com.revature.utils.ConnectionUtil;
 public class CustomerDao implements ICustomerDao {
 
 	public CustomerDao() {
-		// TODO Auto-generated constructor stub
+		// no implementation
 	}
 
 	@Override
-	public void createCustomer() {
-		// TODO Auto-generated method stub
+	/**
+	 * Adds a new customer to the database
+	 * 
+	 * @param Customer the customer to be added to the database
+	 */
+	public void createCustomer(Customer customer) throws SQLException {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			String sql = "insert into customers(f_name, l_name) " +
+						 "values (?, ?)";
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
+			
+			ps.setString(1, customer.getF_name());
+			ps.setString(2, customer.getL_name());
+			
+			ps.executeUpdate();
+			
+		}
+		catch(SQLException e) {
+			throw new SQLException("Customer creation failed: " + customer.getF_name() + customer.getL_name());
+		}
 		
 	}
 
 	@Override
-	public void closeAccount(int customer_id) {
+	public void closeAccount(int customer_id) throws SQLException {
 		// TODO Auto-generated method stub
 		try(Connection conn = ConnectionUtil.getConnection()){
 			
-			
+			/*
 			String sql = "delete from accounts where customer_id_fk = ?";
 			
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, customer_id);
+			*/
 			
-			sql = "delete from customers where customer_id = ?";
 			
-			ps = conn.prepareStatement(sql);
+			String sql = "delete from customers where customer_id = ?";
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, customer_id);
 			
+			ps.executeUpdate();
 		}
 		catch (SQLException e) {
-			
+			throw new SQLException("Failed to remove customer: Accounts still open");
 			//TODO: add sane exception handling here, maybe just re-throw
 			//log.error("Failure to remove customer: " + customer_id);
 		}

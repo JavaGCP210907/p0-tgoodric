@@ -1,5 +1,6 @@
 package com.revature.models;
 
+import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -57,14 +58,20 @@ public class Menu {
 			//TODO
 			break;
 		}//end case
-		case "viewcustomerinfo":{ //prints basic customer information, account info, balance
-			System.out.println("customer");
-			break;
-		}//end case
 		case "newcustomer":{
-			//execute new customer logic
-			log.info("User created new customer: "); //TODO: add customer name, id
-			//break;
+			System.out.println("Enter new customer's first name: ");
+			String f_name = scan.nextLine().strip();
+			System.out.println("Enter new customer's first name: ");
+			String l_name = scan.nextLine().strip();
+			System.out.println("");
+			try {
+				cDao.createCustomer(new Customer(f_name, l_name));
+			} catch (SQLException e) {
+				e.printStackTrace();
+				log.error(e.getMessage());
+			}
+			log.info("User created new customer: " + f_name + " " + l_name); 
+			break;
 		}//end case, fall-through deliberate
 		case "openaccount":{
 			
@@ -75,14 +82,20 @@ public class Menu {
 			viewCustomers();
 			int choice = parseUserInput();
 			if (choice != -1) {
-				cDao.closeAccount(choice);
+				try {
+					cDao.closeAccount(choice);
+				} catch (SQLException e) {
+					log.error(e.getMessage());
+					e.printStackTrace();
+				}
+				log.warn("Customer " + choice + " accounts closed");
 			}
 			else {
 				System.out.println("Invalid selection");
-				log.error("Invalid customer selection: ");
+				log.error("Invalid customer selection: " + choice);
 			}
 			
-			log.warn("Customer " + choice + " accounts closed");
+			
 			break;
 		}//end case
 		case "internaltransfer":{
@@ -167,7 +180,6 @@ public class Menu {
 		System.out.println("ViewAccounts: View a list of all accounts");
 		System.out.println("ViewCustomers: View a list of all customers");
 		System.out.println("ViewAccountInfo: View a summary of the chosen customer's accounts");
-		System.out.println("ViewCustomerInfo: View a summary of a customer's information");
 		System.out.println("NewCustomer: Creates a new customer");
 		System.out.println("OpenAccount: Create a new account for a customer");
 		System.out.println("CloseAccounts: Closes all accounts for a customer");

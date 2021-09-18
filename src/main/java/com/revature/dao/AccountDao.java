@@ -25,7 +25,7 @@ public class AccountDao implements IAccountDao {
 	}
 
 	@Override
-	public void addAccount(int customer_id, String account_type, double balance) {
+	public void addAccount(Account account) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -37,7 +37,7 @@ public class AccountDao implements IAccountDao {
 	}
 
 	@Override
-	public List<Account> getAccountsByCustomerId(int customer_id) {
+	public List<Account> getAccountsByCustomerId(int customer_id) throws SQLException { //not sure if better to handle here or re-throw
 		// TODO Auto-generated method stub
 		try(Connection conn = ConnectionUtil.getConnection()){
 			ResultSet rs = null;
@@ -69,9 +69,15 @@ public class AccountDao implements IAccountDao {
 			return accounts;
 		}
 		catch(SQLException e) {
-			
+			throw e;
 		}
-		return null;
+		//return null;
+	}
+
+	@Override
+	public void removeAccountByCustomerId(int customer_id) throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

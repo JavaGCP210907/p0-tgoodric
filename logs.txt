@@ -1,0 +1,3 @@
+2021-09-18 10:17:33 WARN  Menu:85 - Customer 11 accounts closed
+2021-09-18 11:02:03 INFO  Menu:73 - User created new customer: Bob Fakename
+2021-09-18 11:06:22 INFO  Menu:73 - User created new customer: bob fakename
