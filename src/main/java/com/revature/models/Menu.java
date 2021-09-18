@@ -1,6 +1,7 @@
 package com.revature.models;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -34,16 +35,23 @@ public class Menu {
 	 * upon receiving exit command
 	 * 
 	 * @param selection String containing user selection
-	 * @return boolean used to terminate while loop
+	 * @return boolean used to terminate while loop for runMenu()
 	 */
 	private boolean menuLogic(String selection){ //brace yourself, this is ugly
 		switch(selection.toLowerCase()) { //TODO: Finish switch statement logic in each case including logging
-		case "viewaccounts":{ //COMPLETED
-			List<Account> accounts = aDao.getAccounts();
-			viewAccounts(accounts);
+		case "viewaccounts":{ //COMPLETED 09/18 2:21 PM
+			ArrayList<Account> accounts;
+			try {
+				accounts = aDao.getAccounts();
+				viewAccounts(accounts);
+			} catch (SQLException e) {
+				System.out.println("An error occured while accessing database");
+				log.error(e.getMessage());
+				e.printStackTrace();
+			}//end try/catch
 			break;
 		}//end case
-		case "viewcustomers":{//COMPLETED
+		case "viewcustomers":{//COMPLETED 09/17
 			viewCustomers(); 
 			break;
 		}//end case
@@ -55,26 +63,46 @@ public class Menu {
 			if (choice != -1){
 				
 			}
-			//TODO
+			else {
+				System.out.println("The selected customer was not found.");
+				log.warn("Invalid customer selection: " + choice);
+			}
+			//TODO: Implement Account Info viewing for customer selection
 			break;
 		}//end case
-		case "newcustomer":{
+		case "newcustomer":{ 
 			System.out.println("Enter new customer's first name: ");
 			String f_name = scan.nextLine().strip();
 			System.out.println("Enter new customer's first name: ");
 			String l_name = scan.nextLine().strip();
-			System.out.println("");
+			//System.out.println("");
 			try {
 				cDao.createCustomer(new Customer(f_name, l_name));
 			} catch (SQLException e) {
 				e.printStackTrace();
 				log.error(e.getMessage());
-			}
+			}//end try/catch
 			log.info("User created new customer: " + f_name + " " + l_name); 
-			break;
-		}//end case, fall-through deliberate
+			ArrayList<Customer> result = null;
+			try {
+				result = cDao.getCustomersByName(f_name, l_name);
+			} catch (SQLException e) {
+				log.error(e.getMessage() + e.getSQLState());
+				e.printStackTrace();
+			}
+			if (result != null) {
+				//fetch last item's id, save for use in creating account
+				int customer_id_fk = result.get(result.size() - 1).getCustomer_id(); //Java needs to allow [] notation for Lists
+				System.out.println("Enter initial balance: ");
+				double balance = parseDecimalInput();
+				System.out.println("Enter type of account: ");
+				String account_type = scan.nextLine().strip();
+				aDao.addAccount(new Account(customer_id_fk, account_type, balance));
+				break;
+			}
+		}//end case
 		case "openaccount":{
-			
+			//TODO: Add open Account functionality
 			break;
 		}//end case
 		case "closeaccounts":{
@@ -92,25 +120,40 @@ public class Menu {
 			}
 			else {
 				System.out.println("Invalid selection");
-				log.error("Invalid customer selection: " + choice);
+				log.warn("Invalid customer selection: " + choice);
 			}
 			
 			
 			break;
 		}//end case
 		case "internaltransfer":{
+			//TODO: implement after completing deposit and withdrawal
 			break;
 		}//end case
 		case "withdrawal":{
+			//TODO: implement withdrawal function
 			System.out.println("Which ");
 			break;
 		}
 		case "deposit":{
+			//TODO: implement withdrawal function
 			break;
 		}//end case
 		case "exit":{
 			break;
 		}//end case
+		case "sandbox":{
+			System.out.println("Testing balance alteration");
+			try {
+				aDao.alterBalance(19, -10.0);
+				aDao.alterBalance(20, 10.0);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println(e.getSQLState());
+			}
+			break;
+		}
 		default:{
 			System.out.println("Command \"" + selection + "\" not found");
 			System.out.println();
@@ -121,10 +164,28 @@ public class Menu {
 	}//end menuLogic
 
 	/**
-	 * Displays list of accounts
-	 * @param accounts TODO
+	 * @return double The value parsed from the user input
 	 */
-	private void viewAccounts(List<Account> accounts) {
+	private double parseDecimalInput() {
+		boolean valid = false;
+		double value = 0.0;
+		while(!valid) {
+			try {
+				value = Double.parseDouble(scan.nextLine());
+				valid = true;
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Please enter a numeric value.");
+			}
+		}
+		return value;
+	}
+
+	/**
+	 * Displays list of accounts
+	 * @param accounts The list of accounts to be printed
+	 */
+	private void viewAccounts(ArrayList<Account> accounts) {
 		for (Account a : accounts) {
 			System.out.println(a);
 		}
@@ -156,16 +217,33 @@ public class Menu {
 	}
 
 	/**
-	 * Displays list of customers
+	 * Displays list of all customers
 	 */
 	private void viewCustomers() {
-		List<Customer> customers = cDao.getCustomers();
+		ArrayList<Customer> customers = null;
+		try {
+			customers = cDao.getCustomers();
+		}
+		catch(SQLException e) {
+			log.error(e.getMessage());
+		}
+		if (customers != null) {
+			viewCustomers(customers);
+		}
+	}
+
+	/**
+	 * Displays the list of customers passed
+	 * @param customers The list of customers to be viewed
+	 */
+	private void viewCustomers(List<Customer> customers) {
 		for (Customer c : customers) {
 			System.out.println(c);
 		}
 		
 		System.out.println();
 	}
+	
 	
 	/**
 	 * prints the menu text, moved to separate function
@@ -186,6 +264,7 @@ public class Menu {
 		System.out.println("InternalTransfer: Transfers money between RFCU accounts");
 		System.out.println("Withdrawal: Withdraws money from the chosen account");
 		System.out.println("Deposit: Deposits money to the chosen account");
+		System.out.println("Exit: terminates Account Management System");
 	} //end displayMenuText();
 }
 //TODO: Add input cleaning function

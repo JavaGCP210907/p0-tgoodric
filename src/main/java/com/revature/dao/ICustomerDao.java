@@ -1,9 +1,7 @@
 package com.revature.dao;
 
 import java.sql.SQLException;
-//imports
-import java.util.List;
-
+import java.util.ArrayList;
 import com.revature.models.Customer;
 
 public interface ICustomerDao {
@@ -12,7 +10,9 @@ public interface ICustomerDao {
 	
 	public void closeAccount(int customer_id) throws SQLException;
 	
-	public List<Customer> getCustomers();
+	public ArrayList<Customer> getCustomers() throws SQLException;
 	
-	public List<Customer> getCustomerByID();
+	public ArrayList<Customer> getCustomerByID(int id);
+	
+	public ArrayList<Customer> getCustomersByName(String f_name, String l_name) throws SQLException;
 }

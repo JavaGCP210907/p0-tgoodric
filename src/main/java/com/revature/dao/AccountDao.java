@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.revature.models.Account;
 import com.revature.utils.ConnectionUtil;
@@ -17,61 +16,102 @@ public class AccountDao implements IAccountDao {
 	}
 
 	@Override
-	public List<Account> getAccounts() {
+	public ArrayList<Account> getAccounts() throws SQLException{
 		// TODO Auto-generated method stub
-		
-		
-		return null;
+		try(Connection conn = ConnectionUtil.getConnection()){
+			
+			ResultSet rs = null;
+			String sql = "select * from accounts";
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			return generateResults(rs);
+			
+		}
+		catch(SQLException e) {
+			throw new SQLException("Account list retrieval failed", e.getSQLState());
+		}
 	}
 
 	@Override
 	public void addAccount(Account account) {
-		// TODO Auto-generated method stub
-		
+		try(Connection conn = ConnectionUtil.getConnection()){
+			
+			String sql = "insert into employees (customer_id_fk, account_type, balance)" +
+						 "values (?, ?, ?)";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, account.getCustomer_id_fk());
+			ps.setString(2, account.getAccount_type());
+			ps.setDouble(3, account.getBalance());
+			
+			ps.executeUpdate();
+		}
+		catch(SQLException e) {
+			System.out.println("Account creation failed");
+			e.printStackTrace();
+		}
 	}
 	
+	/**
+	 * Method used to alter the balance for the target account
+	 * @param account_id int The target account's unique identifier
+	 * @param amount double the amount to adjust the existing balance by
+	 * @throws SQLException, probably
+	 */
 	@Override
-	public void alterBalance(int account_id, double balance) {
-		// TODO Auto-generated method stub
-		
+	public void alterBalance(int account_id, double amount) throws SQLException {
+		//TODO: add balance alteration functionality
+		try(Connection conn = ConnectionUtil.getConnection()){
+			String sql = "update accounts set balance = balance + ? where account_id = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setDouble(1, amount);
+			ps.setInt(2, account_id);
+			ps.executeUpdate();
+		}
+		catch(SQLException e) {
+			throw new SQLException("Balance alteration failed", e.getSQLState());
+		}
 	}
 
 	@Override
-	public List<Account> getAccountsByCustomerId(int customer_id) throws SQLException { //not sure if better to handle here or re-throw
+	public ArrayList<Account> getAccountsByCustomerId(int customer_id) throws SQLException { 
 		// TODO Auto-generated method stub
 		try(Connection conn = ConnectionUtil.getConnection()){
 			ResultSet rs = null;
-			
-			//not sure if the join is necessary, could theoretically query on cust_id_fk
-			/*
-			String sql = "select * from accounts inner join customers "
-					   + "on accounts.customer_id_fk = customers.customer_id "
-					   + "where accounts.account_id_fk = ?"; //ugly SQL query string
-			*/
-			String sql = "select * from accounts where account_id_fk = ?";
+
+			String sql = "select * from accounts where customer_id_fk = ?";
 			
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, customer_id);
 			rs = ps.executeQuery();
 			
-			Account a = null;
-			List<Account> accounts = new ArrayList<>();
-			while(rs.next()) {
-				a = new Account(
-					rs.getInt("account_number"),
-					rs.getInt("customer_id_fk"),
-					rs.getString("account_type"),
-					rs.getDouble("balance")
-					);
-				accounts.add(a);
-			}
+			ArrayList<Account> accounts = generateResults(rs);
 			
 			return accounts;
 		}
 		catch(SQLException e) {
-			throw e;
+			throw new SQLException("Account data retrieval failed", e.getSQLState());
 		}
-		//return null;
+	}
+
+	/**
+	 * @param rs The ResultSet used to generate the results
+	 * @return ArrayList<Account> 
+	 * @throws SQLException
+	 */
+	private ArrayList<Account> generateResults(ResultSet rs) throws SQLException {
+		Account a = null;
+		ArrayList<Account> accounts = new ArrayList<>();
+		while(rs.next()) {
+			a = new Account(
+				rs.getInt("account_number"),
+				rs.getInt("customer_id_fk"),
+				rs.getString("account_type"),
+				rs.getDouble("balance")
+				);
+			accounts.add(a);
+		}
+		return accounts;
 	}
 
 	@Override
