@@ -12,7 +12,10 @@ public interface ICustomerDao {
 	
 	public ArrayList<Customer> getCustomers() throws SQLException;
 	
-	public ArrayList<Customer> getCustomerByID(int id) throws SQLException;
+	public ArrayList<Customer> getCustomers(int id) throws SQLException;
 	
-	public ArrayList<Customer> getCustomersByName(String f_name, String l_name) throws SQLException;
+	public ArrayList<Customer> getCustomers(String f_name, String l_name) throws SQLException;
+	
+	public ArrayList<Customer> getCustomers(String f_name, String l_name, String street_address, 
+										   String city, String state) throws SQLException;
 }

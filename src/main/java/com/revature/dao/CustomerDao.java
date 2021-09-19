@@ -87,7 +87,7 @@ public class CustomerDao implements ICustomerDao {
 	}
 
 	@Override
-	public ArrayList<Customer> getCustomerByID(int customer_id) throws SQLException {
+	public ArrayList<Customer> getCustomers(int customer_id) throws SQLException {
 		try(Connection conn = ConnectionUtil.getConnection()){
 			ResultSet rs = null;
 			String sql = "select * from customers where customer_id = ?";
@@ -103,7 +103,7 @@ public class CustomerDao implements ICustomerDao {
 	}
 
 	@Override
-	public ArrayList<Customer> getCustomersByName(String f_name, String l_name) throws SQLException {
+	public ArrayList<Customer> getCustomers(String f_name, String l_name) throws SQLException {
 		
 		try(Connection conn = ConnectionUtil.getConnection()){
 			//set up necessary resources
@@ -146,6 +146,28 @@ public class CustomerDao implements ICustomerDao {
 			customers.add(c);
 		}
 		return customers;
+	}
+
+	@Override
+	public ArrayList<Customer> getCustomers(String f_name, String l_name, String street_address, String city,
+			String state) throws SQLException {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			ResultSet rs = null;
+			String sql = "select * from customers where f_name = ? and l_name = ? "+
+						 "and street_address = ? and city = ? and state = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, f_name);
+			ps.setString(2, l_name);
+			ps.setString(3, street_address);
+			ps.setString(4, city);
+			ps.setString(5, state);
+			
+			rs = ps.executeQuery();
+			return generateResults(rs);
+		}
+		catch (SQLException e) {
+			throw new SQLException("Customer retrieval failed", e.getSQLState());
+		}
 	}
 	
 }
