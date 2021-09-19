@@ -45,15 +45,7 @@ public class CustomerDao implements ICustomerDao {
 	public void closeAccount(int customer_id) throws SQLException {
 		// TODO Auto-generated method stub
 		try(Connection conn = ConnectionUtil.getConnection()){
-			
-			/*
-			String sql = "delete from accounts where customer_id_fk = ?";
-			
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, customer_id);
-			*/
-			
-			
+						
 			String sql = "delete from customers where customer_id = ?";
 			
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -62,7 +54,7 @@ public class CustomerDao implements ICustomerDao {
 			ps.executeUpdate();
 		}
 		catch (SQLException e) {
-			throw new SQLException("Failed to remove customer: Accounts still open", e.getSQLState());
+			throw new SQLException("Failed to remove customer: Accounts still open", e.getSQLState()); //probably
 			//Completed 09/18, exception rethrown
 		}
 	}
@@ -76,28 +68,38 @@ public class CustomerDao implements ICustomerDao {
 			//initialize result set
 			ResultSet rs = null;
 			//generate sql string
-			String sql = "select * from customers";
+			String sql = "select * from customers sort by asc";
 			//generate statement and execute query
 			Statement s = conn.createStatement();
 			rs = s.executeQuery(sql);
 			
 			//populate list with the results
-			ArrayList<Customer> customerList = generateResults(rs);
+			return generateResults(rs);
 			
-			return customerList;
+			 
 			
 		}//end try
 		catch(SQLException e) {
 			//completed: per decision 09/18 all exceptions in DAO layer are
 			//to be re-thrown with message for logger
-			throw new SQLException("Error accessing customers table"); 
+			throw new SQLException("Error accessing customers table", e.getSQLState()); 
 		}
 	}
 
 	@Override
-	public ArrayList<Customer> getCustomerByID(int id) {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Customer> getCustomerByID(int customer_id) throws SQLException {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			ResultSet rs = null;
+			String sql = "select * from customers where customer_id = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, customer_id);
+			
+			rs = ps.executeQuery();
+			return generateResults(rs);
+		}
+		catch (SQLException e) {
+			throw new SQLException("Customer retrieval failed", e.getSQLState());
+		}
 	}
 
 	@Override
@@ -107,7 +109,7 @@ public class CustomerDao implements ICustomerDao {
 			//set up necessary resources
 			
 			ResultSet rs = null;
-			String sql = "select * from accounts where (f_name = ?) and (l_name = ?)";
+			String sql = "select * from accounts where f_name = ? and l_name = ? sort by asc";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			
 			//generate and execute query
@@ -121,7 +123,7 @@ public class CustomerDao implements ICustomerDao {
 			
 		}
 		catch (SQLException e) {
-			throw new SQLException("Customer " + f_name +" "+ l_name + " not found");
+			throw new SQLException("Customer " + f_name +" "+ l_name + " not found", e.getSQLState());
 		}
 	}
 
@@ -136,7 +138,10 @@ public class CustomerDao implements ICustomerDao {
 			Customer c = new Customer(
 					rs.getInt("customer_id"),
 					rs.getString("f_name"),
-					rs.getString("l_name")
+					rs.getString("l_name"),
+					rs.getString("street_address"),
+					rs.getString("city"),
+					rs.getString("state")
 					);
 			customers.add(c);
 		}

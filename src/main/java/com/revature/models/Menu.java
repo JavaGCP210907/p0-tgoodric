@@ -2,7 +2,6 @@ package com.revature.models;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -59,7 +58,7 @@ public class Menu {
 			System.out.println("Select customer: ");
 			System.out.println();
 			viewCustomers();
-			int choice = parseUserInput();
+			int choice = parseIntegerInput();
 			if (choice != -1){
 				
 			}
@@ -73,11 +72,17 @@ public class Menu {
 		case "newcustomer":{ 
 			System.out.println("Enter new customer's first name: ");
 			String f_name = scan.nextLine().strip();
-			System.out.println("Enter new customer's first name: ");
+			System.out.println("Enter new customer's last name: ");
 			String l_name = scan.nextLine().strip();
+			System.out.println("Enter new customer's street address: ");
+			String street_address = scan.nextLine().strip();
+			System.out.println("Enter new customer's city: ");
+			String city = scan.nextLine().strip();
+			System.out.println("Enter new customer's state: ");
+			String state = scan.nextLine().strip();
 			//System.out.println("");
 			try {
-				cDao.createCustomer(new Customer(f_name, l_name));
+				cDao.createCustomer(new Customer(f_name, l_name, street_address, city, state));
 			} catch (SQLException e) {
 				e.printStackTrace();
 				log.error(e.getMessage());
@@ -92,23 +97,44 @@ public class Menu {
 			}
 			if (result != null) {
 				//fetch last item's id, save for use in creating account
+				//last item will be the most recently created item
 				int customer_id_fk = result.get(result.size() - 1).getCustomer_id(); //Java needs to allow [] notation for Lists
 				System.out.println("Enter initial balance: ");
 				double balance = parseDecimalInput();
 				System.out.println("Enter type of account: ");
 				String account_type = scan.nextLine().strip();
 				aDao.addAccount(new Account(customer_id_fk, account_type, balance));
-				break;
 			}
+			else {
+				System.out.println();
+			}
+			break;
 		}//end case
 		case "openaccount":{
-			//TODO: Add open Account functionality
+			System.out.println("Enter first name of customer opening account");
+			String f_name = scan.nextLine().strip();
+			System.out.println("Enter last name of customer opening account");
+			String l_name = scan.nextLine().strip();
+			ArrayList<Customer> customers = null;
+			int customer_id_fk;
+			try {
+				customers = cDao.getCustomersByName(f_name, l_name);
+			} catch (SQLException e) {
+				log.error(e.getMessage() + " " + e.getSQLState());
+				e.printStackTrace();
+			}
+			customer_id_fk = selectCustomer(customers);
+			System.out.println("Enter type of account: ");
+			String account_type = scan.nextLine().strip();
+			System.out.println("Enter initial balance: ");
+			double balance = parseDecimalInput();
+			aDao.addAccount(new Account(customer_id_fk, account_type, balance));
 			break;
 		}//end case
 		case "closeaccounts":{
 			System.out.println("Enter customer id to close accounts");
 			viewCustomers();
-			int choice = parseUserInput();
+			int choice = parseIntegerInput();
 			if (choice != -1) {
 				try {
 					cDao.closeAccount(choice);
@@ -164,6 +190,25 @@ public class Menu {
 	}//end menuLogic
 
 	/**
+	 * @param customers
+	 */
+	private int selectCustomer(ArrayList<Customer> customers) {
+		int customer_id = -1; //error code
+		if ((customers != null) && (customers.size() > 0)) {
+			if(customers.size() == 1) {
+				customer_id = customers.get(0).getCustomer_id();
+			}
+			else {
+				System.out.println("select customer from the following:");
+				for (int i = 0; i < customers.size(); i++) {
+					System.out.println(i + ": " + customers.get(i));
+				}
+			}
+		}
+		return customer_id;
+	}
+
+	/**
 	 * @return double The value parsed from the user input
 	 */
 	private double parseDecimalInput() {
@@ -172,12 +217,18 @@ public class Menu {
 		do {
 			try {
 				value = Double.parseDouble(scan.nextLine());
-				valid = true;
+				if(value >= 0.0) {
+					valid = true;
+				}
+				else {
+					System.out.println("enter a nonnegative value");
+				}
 			}
 			catch (NumberFormatException e) {
 				System.out.println("Please enter a numeric value.");
 			}
 		} while(!valid);
+		
 		return value;
 	}
 
@@ -197,23 +248,22 @@ public class Menu {
 	 * Parses out customer ID
 	 * @return int customer id number, or -1 if error occurs
 	 */
-	private int parseUserInput() {
-		int choice;
-		try {
-				choice = scan.nextInt();
-				if (choice < 0) {
-					return -1; //error code
-				}
+	private int parseIntegerInput() {
+		boolean valid = false;
+		int value = 0;
+		do {
+			try {
+				value = Integer.parseInt(scan.nextLine());
+				valid = true;
+			}
+			catch (NumberFormatException e) {
+				System.out.println("Please enter a numeric value.");
+			}
+		} while(!valid);
+		if (value < 1) {
+			return -1;
 		}
-		catch(InputMismatchException e){
-			System.out.println("Please enter a numeric value");
-			log.error("User entered non-numeric user ID");
-			return -1; //error code
-		}
-		finally {
-			scan.nextLine();//flush scanner input
-		}
-		return choice;
+		return value;
 	}
 
 	/**
