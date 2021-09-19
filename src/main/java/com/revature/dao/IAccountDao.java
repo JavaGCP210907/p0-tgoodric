@@ -15,7 +15,8 @@ public interface IAccountDao {
 	
 	public ArrayList<Account> getAccountsByCustomerId(int customer_id) throws SQLException;
 	
-	public void removeAccountByCustomerId(int customer_id) throws SQLException;
+	public void removeAccountsByCustomerId(int customer_id) throws SQLException;
 	
+	public void removeAccount(int account_id) throws SQLException;
 	//public List<Account> getAccountsByName
 }

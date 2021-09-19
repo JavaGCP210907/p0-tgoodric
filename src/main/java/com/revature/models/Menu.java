@@ -169,7 +169,7 @@ public class Menu {
 	private double parseDecimalInput() {
 		boolean valid = false;
 		double value = 0.0;
-		while(!valid) {
+		do {
 			try {
 				value = Double.parseDouble(scan.nextLine());
 				valid = true;
@@ -177,7 +177,7 @@ public class Menu {
 			catch (NumberFormatException e) {
 				System.out.println("Please enter a numeric value.");
 			}
-		}
+		} while(!valid);
 		return value;
 	}
 

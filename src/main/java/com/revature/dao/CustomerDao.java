@@ -62,7 +62,7 @@ public class CustomerDao implements ICustomerDao {
 			ps.executeUpdate();
 		}
 		catch (SQLException e) {
-			throw new SQLException("Failed to remove customer: Accounts still open");
+			throw new SQLException("Failed to remove customer: Accounts still open", e.getSQLState());
 			//Completed 09/18, exception rethrown
 		}
 	}
@@ -82,19 +82,7 @@ public class CustomerDao implements ICustomerDao {
 			rs = s.executeQuery(sql);
 			
 			//populate list with the results
-			ArrayList<Customer> customerList = new ArrayList<>();
-			
-			Customer cust = null;
-			
-			while(rs.next()) {
-				cust = new Customer(
-						rs.getInt("customer_id"),
-						rs.getString("f_name"),
-						rs.getString("l_name")
-						);
-						
-				customerList.add(cust);
-			} //end while
+			ArrayList<Customer> customerList = generateResults(rs);
 			
 			return customerList;
 			
@@ -154,5 +142,5 @@ public class CustomerDao implements ICustomerDao {
 		}
 		return customers;
 	}
-
+	
 }

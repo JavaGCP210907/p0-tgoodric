@@ -17,7 +17,7 @@ public class AccountDao implements IAccountDao {
 
 	@Override
 	public ArrayList<Account> getAccounts() throws SQLException{
-		// TODO Auto-generated method stub
+		// completed
 		try(Connection conn = ConnectionUtil.getConnection()){
 			
 			ResultSet rs = null;
@@ -59,8 +59,7 @@ public class AccountDao implements IAccountDao {
 	 * @throws SQLException, probably
 	 */
 	@Override
-	public void alterBalance(int account_id, double amount) throws SQLException {
-		//TODO: add balance alteration functionality
+	public void alterBalance(int account_id, double amount) throws SQLException { //completed
 		try(Connection conn = ConnectionUtil.getConnection()){
 			String sql = "update accounts set balance = balance + ? where account_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -75,7 +74,7 @@ public class AccountDao implements IAccountDao {
 
 	@Override
 	public ArrayList<Account> getAccountsByCustomerId(int customer_id) throws SQLException { 
-		// TODO Auto-generated method stub
+		//completed
 		try(Connection conn = ConnectionUtil.getConnection()){
 			ResultSet rs = null;
 
@@ -115,8 +114,26 @@ public class AccountDao implements IAccountDao {
 	}
 
 	@Override
-	public void removeAccountByCustomerId(int customer_id) throws SQLException {
-		// TODO Auto-generated method stub
+	public void removeAccountsByCustomerId(int customer_id_fk) throws SQLException {
+		//completed
+		ArrayList<Account> accountsRemoved = getAccountsByCustomerId(customer_id_fk);
+		for (Account account : accountsRemoved) {
+			removeAccount(account.getAccount_id());
+		}
+	}
+
+	@Override
+	public void removeAccount(int account_id) throws SQLException {
+		
+		try(Connection conn = ConnectionUtil.getConnection()) {
+			String sql = "delete from accounts where account_id = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, account_id);
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			throw new SQLException("Account closing failed", e.getSQLState());
+		}
 		
 	}
 	
