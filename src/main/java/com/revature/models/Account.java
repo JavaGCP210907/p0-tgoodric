@@ -77,6 +77,12 @@ public class Account {
 		return account_id;
 	}
 
+	@Override
+	public String toString() {
+		return "Account [account_id=" + account_id + ", customer_id_fk=" + customer_id_fk + ", account_type="
+				+ account_type + ", balance=" + balance + "]";
+	}
+
 	/**
 	 * @param account_number the account_number to set
 	 */

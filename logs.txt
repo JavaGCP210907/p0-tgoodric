@@ -26,3 +26,19 @@
 2021-09-19 21:57:08 ERROR Menu:109 - Failed to remove customer: Accounts still open
 2021-09-19 21:57:08 WARN  Menu:112 - Customer 22 accounts closed
 2021-09-19 22:03:51 ERROR Menu:239 - Account list retrieval failed42703
+2021-09-20 09:36:04 ERROR Menu:81 - Account data retrieval failed, check the logic in the getAccounts function 42703
+2021-09-20 11:10:06 ERROR Menu:184 - Account data retrieval failed, check the logic in the getAccounts function42703
+2021-09-20 11:10:06 WARN  Menu:200 - User selected invalid account for transaction
+2021-09-20 11:36:26 ERROR Menu:184 - Account list retrieval failed42703
+2021-09-20 11:36:26 WARN  Menu:200 - User selected invalid account for transaction
+2021-09-20 11:39:10 ERROR Menu:81 - Account list retrieval failed 42703
+2021-09-20 12:02:07 ERROR Menu:295 - Account list retrieval failed42703
+2021-09-20 12:05:09 INFO  Menu:275 - User created new customer: John Smith
+2021-09-20 12:06:22 ERROR Menu:183 - Account list retrieval failed42703
+2021-09-20 12:06:22 WARN  Menu:199 - User selected invalid account for transaction
+2021-09-20 12:08:07 ERROR Menu:295 - Account list retrieval failed42703
+2021-09-20 12:12:26 ERROR Menu:295 - Account list retrieval failed42703
+2021-09-20 12:13:56 ERROR Menu:295 - Account list retrieval failed42703
+2021-09-20 12:15:49 ERROR Menu:295 - Account list retrieval failed42703
+2021-09-20 12:17:11 ERROR Menu:295 - Account list retrieval failed42703
+2021-09-20 12:44:08 WARN  Menu:76 - Customer 24 accounts closed
