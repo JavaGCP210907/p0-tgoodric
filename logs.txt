@@ -1,3 +1,28 @@
 2021-09-18 10:17:33 WARN  Menu:85 - Customer 11 accounts closed
 2021-09-18 11:02:03 INFO  Menu:73 - User created new customer: Bob Fakename
 2021-09-18 11:06:22 INFO  Menu:73 - User created new customer: bob fakename
+2021-09-19 19:32:52 ERROR Menu:81 - Customer Bruce Wayne not found 42601
+2021-09-19 19:37:40 ERROR Menu:81 - Customer Bruce Wayne not found 42601
+2021-09-19 19:38:55 ERROR Menu:81 - Customer bruce wany not found 42703
+2021-09-19 19:39:18 ERROR Menu:81 - Customer Bruce Wayne not found 42703
+2021-09-19 19:39:53 ERROR Menu:337 - Error accessing customers table
+2021-09-19 19:41:11 ERROR Menu:81 - Customer Bruce Wayne not found 42703
+2021-09-19 19:44:05 ERROR Menu:81 - Customer Bruce Wayne not found 42601
+2021-09-19 19:45:03 ERROR Menu:81 - Account data retrieval failed 42703
+2021-09-19 19:48:33 ERROR Menu:81 - Account data retrieval failed 42703
+2021-09-19 19:58:15 ERROR Menu:81 - Account data retrieval failed 42703
+2021-09-19 20:00:43 INFO  Menu:201 - User created new customer: Fat Albert
+2021-09-19 20:54:27 ERROR Menu:214 - Customer creation failed: FatAlbert
+2021-09-19 20:54:27 INFO  Menu:216 - User created new customer: Fat Albert
+2021-09-19 20:58:10 ERROR Menu:214 - Customer creation failed: PDiddy
+2021-09-19 20:58:10 INFO  Menu:216 - User created new customer: P Diddy
+2021-09-19 21:01:58 ERROR Menu:214 - Customer creation failed: AlanKeyes
+2021-09-19 21:01:58 INFO  Menu:216 - User created new customer: Alan Keyes
+2021-09-19 21:15:38 INFO  Menu:216 - User created new customer: Kathy Goodrich
+2021-09-19 21:24:20 WARN  Menu:208 - User attempted to create a duplicate account: Kathy Goodrich
+2021-09-19 21:24:20 INFO  Menu:217 - User created new customer: Kathy Goodrich
+2021-09-19 21:28:34 ERROR Menu:82 - Account data retrieval failed 42703
+2021-09-19 21:31:08 ERROR Menu:82 - Account data retrieval failed, check the logic in the getAccounts function 42703
+2021-09-19 21:57:08 ERROR Menu:109 - Failed to remove customer: Accounts still open
+2021-09-19 21:57:08 WARN  Menu:112 - Customer 22 accounts closed
+2021-09-19 22:03:51 ERROR Menu:239 - Account list retrieval failed42703

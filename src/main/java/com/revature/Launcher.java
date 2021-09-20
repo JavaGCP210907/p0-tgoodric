@@ -5,8 +5,7 @@ import com.revature.models.Menu;
 public class Launcher {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
+		//nothing to see here, move along
 		Menu menu = new Menu();
 		
 		menu.runMenu();

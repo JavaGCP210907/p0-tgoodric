@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import com.revature.models.Account;
@@ -23,8 +24,8 @@ public class AccountDao implements IAccountDao {
 			ResultSet rs = null;
 			String sql = "select * from accounts";
 			
-			PreparedStatement ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
+			Statement ps = conn.createStatement();
+			rs = ps.executeQuery(sql);
 			return generateResults(rs);
 			
 		}
@@ -37,7 +38,7 @@ public class AccountDao implements IAccountDao {
 	public void addAccount(Account account) {
 		try(Connection conn = ConnectionUtil.getConnection()){
 			
-			String sql = "insert into employees (customer_id_fk, account_type, balance)" +
+			String sql = "insert into accounts (customer_id_fk, account_type, balance)" +
 						 "values (?, ?, ?)";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, account.getCustomer_id_fk());
@@ -73,7 +74,7 @@ public class AccountDao implements IAccountDao {
 	}
 
 	@Override
-	public ArrayList<Account> getAccountsByCustomerId(int customer_id) throws SQLException { 
+	public ArrayList<Account> getAccounts(int customer_id_fk) throws SQLException { 
 		//completed
 		try(Connection conn = ConnectionUtil.getConnection()){
 			ResultSet rs = null;
@@ -81,7 +82,7 @@ public class AccountDao implements IAccountDao {
 			String sql = "select * from accounts where customer_id_fk = ?";
 			
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, customer_id);
+			ps.setInt(1, customer_id_fk);
 			rs = ps.executeQuery();
 			
 			ArrayList<Account> accounts = generateResults(rs);
@@ -89,7 +90,7 @@ public class AccountDao implements IAccountDao {
 			return accounts;
 		}
 		catch(SQLException e) {
-			throw new SQLException("Account data retrieval failed", e.getSQLState());
+			throw new SQLException("Account data retrieval failed, check the logic in the getAccounts function", e.getSQLState());
 		}
 	}
 
@@ -116,7 +117,7 @@ public class AccountDao implements IAccountDao {
 	@Override
 	public void removeAccountsByCustomerId(int customer_id_fk) throws SQLException {
 		//completed
-		ArrayList<Account> accountsRemoved = getAccountsByCustomerId(customer_id_fk);
+		ArrayList<Account> accountsRemoved = getAccounts(customer_id_fk);
 		for (Account account : accountsRemoved) {
 			removeAccount(account.getAccount_id());
 		}

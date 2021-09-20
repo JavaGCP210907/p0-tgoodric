@@ -13,7 +13,7 @@ public interface IAccountDao {
 	
 	public void alterBalance(int account_id, double amount) throws SQLException;
 	
-	public ArrayList<Account> getAccountsByCustomerId(int customer_id) throws SQLException;
+	public ArrayList<Account> getAccounts(int customer_id) throws SQLException;
 	
 	public void removeAccountsByCustomerId(int customer_id) throws SQLException;
 	
