@@ -53,14 +53,13 @@ public class AccountDao implements IAccountDao {
 		}
 	}
 	
-	public double getBalance(int customerId, int accountId) throws SQLException {
+	public double getBalance(int accountId) throws SQLException {
 		try(Connection conn = ConnectionUtil.getConnection()){
 			ResultSet rs = null;
-			String sql = "select * from accounts where customer_id_fk = ? and account_id = ?";
+			String sql = "select * from accounts where account_id = ?";
 			
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, customerId);
-			ps.setInt(2, accountId);
+			ps.setInt(1, accountId);
 			
 			rs = ps.executeQuery();
 			ArrayList<Account> results = generateResults(rs);

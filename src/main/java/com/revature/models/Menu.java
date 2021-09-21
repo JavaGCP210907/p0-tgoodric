@@ -64,7 +64,7 @@ public class Menu {
 			break;
 		}//end case
 		case "internaltransfer":{
-			balanceTransfer(); //extracted for readability
+			internalTransfer(); //extracted for readability
 			break;
 		}//end case
 		case "withdrawal":{
@@ -79,15 +79,7 @@ public class Menu {
 			System.out.println("Terminating program.");
 			break;
 		}//end case
-		case "sandbox":{
-			
-			try {
-				System.out.println(aDao.getBalance(1,1));
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+
 		default:{
 			System.out.println("Command \"" + selection + "\" not found");
 			System.out.println();
@@ -126,7 +118,7 @@ public class Menu {
 	/**
 	 * Wrapper function for internal balance transfers, extracted for aesthetics
 	 */
-	private void balanceTransfer() {
+	private void internalTransfer() {
 		System.out.println("Enter first name of source customer: ");
 		String sourceFirstName = scan.nextLine();
 		System.out.println("Enter last name of source customer: ");
@@ -154,17 +146,12 @@ public class Menu {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		double balance = 0.0;
-		if((sourceAccountId != -1) && (targetAccountId != -1)) {
-			System.out.println("Enter balance to be transferred");
-			balance = parseDecimalInput();
-			try {
-				aDao.alterBalance(sourceAccountId, balance * -1.0);
-				aDao.alterBalance(targetAccountId, balance);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		double amount = 0.0;
+		if((sourceAccountId != -1) && (targetAccountId != -1)) {		
+			boolean successful = alterBalance(sourceId, sourceAccountId, amount * -1.0);
+				if(successful) {
+					alterBalance(targetId, targetAccountId, amount);
+				}
 		}
 		else {
 			log.warn("An invalid customer was selected for an internal transfer");
@@ -292,7 +279,7 @@ public class Menu {
 
 			try {
 				   //deposits can't overdraw, withdrawing a smaller amount than balance won't either
-				if((multiplier > 0.0 ) || (amount < aDao.getBalance(customerId, accountId))){
+				if((multiplier > 0.0 ) || (amount < aDao.getBalance(accountId))){
 								aDao.alterBalance(accountId, (multiplier * amount));
 								log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
 								return true;

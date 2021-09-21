@@ -52,3 +52,4 @@
 2021-09-21 13:52:53 ERROR Menu:296 - Error accessing account balance42601
 2021-09-21 13:56:57 ERROR Menu:296 - Error accessing account balance42601
 2021-09-21 15:24:48 WARN  Menu:301 - Customer 1 attempted to overdraw account 1
+2021-09-21 17:23:44 WARN  Menu:291 - Customer 1 attempted to overdraw account 1
