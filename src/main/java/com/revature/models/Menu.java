@@ -36,19 +36,19 @@ public class Menu {
 	 * @param selection String containing user selection
 	 * @return boolean used to terminate while loop for runMenu()
 	 */
-	private boolean menuLogic(String selection){ //brace yourself, this is ugly
+	private boolean menuLogic(String selection){
 		//boolean newCustomerFlag = false;
-		switch(selection.toLowerCase()) { //TODO: Finish switch statement logic in each case including logging
+		switch(selection.toLowerCase()) { //TODO: Test all the functions
 		case "viewaccounts":{ //COMPLETED 09/18 2:21 PM
 			viewAccounts(); //extracted completed function for readability of switch
 			break;
 		}//end case
 		case "viewcustomers":{//COMPLETED 09/17
-			viewCustomers();  //extracted for readability
+			viewCustomers(); //extracted for readability
 			break;
 		}//end case
 		case "viewaccountinfo":{ 
-			viewAccountInfo();//Extracted for readability
+			viewAccountInfo(); //Extracted for readability
 			break;
 		}//end case
 		case "newcustomer":{ 
@@ -56,7 +56,7 @@ public class Menu {
 			break;
 		}//end case
 		case "openaccount":{
-			openAccount();
+			openAccount(); //extracted for readability
 			break;
 		}//end case
 		case "closeaccounts":{
@@ -64,68 +64,114 @@ public class Menu {
 			break;
 		}//end case
 		case "internaltransfer":{
-			System.out.println("Enter first name of source customer: ");
-			String sourceFirstName = scan.nextLine();
-			System.out.println("Enter last name of source customer: ");
-			String sourceLastName = scan.nextLine();
-			System.out.println("enter first Name of target customer: ");
-			//TODO: finish the internal transfer method, possibly as a transaction
+			balanceTransfer(); //extracted for readability
 			break;
 		}//end case
 		case "withdrawal":{
-			System.out.println("Which customer is withdrawing money?");
-			viewCustomers();
-			System.out.println("Enter customer first name: ");
-			String f_name = scan.nextLine().strip();
-			System.out.println("Enter customer last name: ");
-			String l_name = scan.nextLine().strip();
-			withdrawal(f_name, l_name);
+			withdrawal(); //extracted for readability
 			break;
 		}
 		case "deposit":{
-			System.out.println("Which customer is depositing money?");
-			viewCustomers();
-			System.out.println("Enter customer first name: ");
-			String f_name = scan.nextLine().strip();
-			System.out.println("Enter customer last name: ");
-			String l_name = scan.nextLine().strip();
-			deposit(f_name, l_name);
+			deposit(); //extracted for readability
 			break;
 		}//end case
 		case "exit":{
 			System.out.println("Terminating program.");
 			break;
 		}//end case
-		case "sandbox":{
-			System.out.println("fetch accounts by name");
-			try {
-				ArrayList<Account> result = aDao.getAccounts("Tristan", "Goodrich");
-				System.out.println(result);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println(e.getSQLState());
-			}
-			break;
-		}
 		default:{
 			System.out.println("Command \"" + selection + "\" not found");
 			System.out.println();
 		}//end default
 		}//end switch
 
-		return selection.toLowerCase().equals("exit"); //strip spaces, clean input in separate method?
+		return selection.toLowerCase().strip().equals("exit");
 	}//end menuLogic
 
 	/**
-	 * @param f_name
-	 * @param l_name
+	 * Wrapper function for deposits, extracted for aesthetics
 	 */
-	private void deposit(String f_name, String l_name) {
-		int customer_id = selectCustomer(f_name, l_name);
-		int account_id = -1;
+	private void deposit() {
+		System.out.println("Which customer is depositing money?");
+		viewCustomers();
+		System.out.println("Enter customer first name: ");
+		String fName = scan.nextLine().strip();
+		System.out.println("Enter customer last name: ");
+		String lName = scan.nextLine().strip();
+		deposit(fName, lName);
+	}
+
+	/**
+	 * Wrapper function for withdrawals, extracted for aesthetics
+	 */
+	private void withdrawal() {
+		System.out.println("Which customer is withdrawing money?");
+		viewCustomers();
+		System.out.println("Enter customer first name: ");
+		String fName = scan.nextLine().strip();
+		System.out.println("Enter customer last name: ");
+		String lName = scan.nextLine().strip();
+		withdrawal(fName, lName);
+	}
+
+	/**
+	 * Wrapper function for internal balance transfers, extracted for aesthetics
+	 */
+	private void balanceTransfer() {
+		System.out.println("Enter first name of source customer: ");
+		String sourceFirstName = scan.nextLine();
+		System.out.println("Enter last name of source customer: ");
+		String sourceLastName = scan.nextLine();	
+		
+		int sourceId = selectCustomer(sourceFirstName, sourceLastName);
+		int sourceAccountId = -1; //error code, will be changed if data retrieval is successful
+		try {
+			sourceAccountId = selectAccount(aDao.getAccounts(sourceId));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//note no constraints on allowing same customer
+		System.out.println("enter first Name of target customer: ");
+		String targetFirstName = scan.nextLine();
+		System.out.println("Enter last name of source customer: ");
+		String targetLastName = scan.nextLine();
+		int targetId = selectCustomer(targetFirstName, targetLastName);
+		int targetAccountId = -1;
+		try {
+			targetAccountId = selectAccount(aDao.getAccounts(targetId));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		double balance = 0.0;
+		if((sourceAccountId != -1) && (targetAccountId != -1)) {
+			System.out.println("Enter balance to be transferred");
+			balance = parseDecimalInput();
+			try {
+				aDao.alterBalance(sourceAccountId, balance * -1.0);
+				aDao.alterBalance(targetAccountId, balance);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else {
+			log.warn("An invalid customer was selected for an internal transfer");
+		}
+	}
+
+	/**
+	 * Contains the logic for withdrawing funds
+	 * @param fName The first name of the customer depositing funds
+	 * @param lName The last name of the customer depositing funds
+	 */
+	private void deposit(String fName, String lName) {
+		int customerId = selectCustomer(fName, lName);
+		int accountId = -1;
 		double multiplier = 1.0;
-		alterBalance(customer_id, account_id, multiplier);
+		alterBalance(customerId, accountId, multiplier);
 	}
 
 	/**
@@ -133,10 +179,10 @@ public class Menu {
 	 */
 	private void closeAccounts() {
 		System.out.println("Enter first name of customer to close account");
-		String f_name = scan.nextLine();
+		String fName = scan.nextLine();
 		System.out.println("Enter last name of customer to close account");
-		String l_name = scan.nextLine();
-		int choice = selectCustomer(f_name, l_name);
+		String lName = scan.nextLine();
+		int choice = selectCustomer(fName, lName);
 		if (choice != -1) {
 			try {
 				cDao.closeAccount(choice);
@@ -154,14 +200,26 @@ public class Menu {
 	}
 
 	/**
-	 * @param f_name
-	 * @param l_name
+	 * Contains the logic for withdrawing funds
+	 * @param fName The first name of the person withdrawing money
+	 * @param lName The last name of the person withdrawing money
 	 */
-	private void withdrawal(String f_name, String l_name) {
-		int customer_id = selectCustomer(f_name, l_name);
-		int account_id = -1;
+	private void withdrawal(String fName, String lName) {
+		int customerId = selectCustomer(fName, lName);
+		int accountId = -1;
+		ArrayList<Account> accounts = null;
+		try {
+			accounts = aDao.getAccounts(customerId);
+			accountId = selectAccount(accounts);
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+			log.error(e.getMessage() + " " + e.getSQLState());
+		}
 		double multiplier = -1.0;
-		alterBalance(customer_id, account_id, multiplier);
+		if((customerId != -1) && (accountId != -1)) {
+			alterBalance(customerId, accountId, multiplier);
+		}
 	}
 
 	/**
@@ -169,20 +227,18 @@ public class Menu {
 	 */
 	private void viewAccountInfo() {
 		System.out.println("Enter the first name of the customer whose account info you want to view: ");
-		String f_name = scan.nextLine().strip();
+		String fName = scan.nextLine().strip();
 		System.out.println("Enter the last name of the customer whose account info you want to view: ");
-		String l_name = scan.nextLine().strip();
+		String lName = scan.nextLine().strip();
 		ArrayList<Customer> customers = null;
 		ArrayList<Account> accounts = null;
 		double totalBalance = 0.0;
-		int customer_id_fk = -1; //error code, will be changed if execution successful
+		int customerIdFk = -1; //error code, will be changed if execution successful
 		try {
-			customers = cDao.getCustomers(f_name, l_name);
+			customers = cDao.getCustomers(fName, lName);
 			if (customers != null && customers.size() > 0) { 
-				customer_id_fk = selectCustomer(customers);
-				//TODO: continue wiht implementation of account info viewing. 
-				//Print each account for the selected customer
-				accounts = aDao.getAccounts(customer_id_fk);
+				customerIdFk = selectCustomer(customers);
+				accounts = aDao.getAccounts(customerIdFk);
 				for (Account account : accounts) {
 					System.out.println("Account type: " + account.getAccount_type());
 					System.out.printf("Balance: $%.2f", account.getBalance());
@@ -204,25 +260,26 @@ public class Menu {
 	}
 
 	/**
-	 * @param customer_id The customer whose account balance is being changed
-	 * @param account_id The account whose balance is being changed
-	 * @param multiplier either 1 or -1 depending on 
+	 * General function for adjusting balance called by the deposit/withdrawal functions
+	 * @param customerId The customer whose account balance is being changed
+	 * @param accountId The account whose balance is being changed
+	 * @param multiplier either 1 or -1 depending on deposit/withdrawal
 	 */
-	private void alterBalance(int customer_id, int account_id, double multiplier) {
+	private void alterBalance(int customerId, int accountId, double multiplier) {
 		try {
-			ArrayList<Account> accounts = aDao.getAccounts(customer_id);
-			account_id = selectAccount(accounts);
+			ArrayList<Account> accounts = aDao.getAccounts(customerId);
+			accountId = selectAccount(accounts);
 		} catch (SQLException e) {
 			log.error(e.getMessage() + e.getSQLState());
 			e.printStackTrace();
 		}
-		if(account_id != -1) {
+		if(accountId != -1) {
 			System.out.println("Enter amount: ");
 			double amount = parseDecimalInput();
 
 			try {
-				aDao.alterBalance(account_id, (multiplier * amount));
-				log.info("Account " + account_id + " balance changed by " + (multiplier * amount));
+				aDao.alterBalance(accountId, (multiplier * amount));
+				log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
 			} catch (SQLException e) {
 				log.error(e.getMessage() + e.getSQLState());
 				e.printStackTrace();
@@ -235,15 +292,16 @@ public class Menu {
 	}
 
 	/**
-	 * @param f_name
-	 * @param l_name
+	 * @param fName
+	 * @param lName
 	 * @return
 	 */
-	private int selectCustomer(String f_name, String l_name) {
+	private int selectCustomer(String fName, String lName) {
 		ArrayList<Customer> results = null;
 		try {
-			results = cDao.getCustomers(f_name, l_name);
-		} catch (SQLException e) {
+			results = cDao.getCustomers(fName, lName);
+		} 
+		catch (SQLException e) {
 			log.error(e.getMessage() + e.getSQLState());
 		}
 		int choice = selectCustomer(results);
@@ -251,36 +309,37 @@ public class Menu {
 	}
 
 	/**
-	 * 
+	 * Prompts user for name to create new account
 	 */
 	private void openAccount() {
 		System.out.println("Enter first name of customer opening account");
-		String f_name = scan.nextLine().strip();
+		String fName = scan.nextLine().strip();
 		System.out.println("Enter last name of customer opening account");
-		String l_name = scan.nextLine().strip();
+		String lName = scan.nextLine().strip();
 		ArrayList<Customer> customers = null;
-		int customer_id_fk;
+		int customerIdFk;
 		try {
-			customers = cDao.getCustomers(f_name, l_name);
+			customers = cDao.getCustomers(fName, lName);
 		} catch (SQLException e) {
 			log.error(e.getMessage() + " " + e.getSQLState());
 			e.printStackTrace();
 		}
 
-		customer_id_fk = selectCustomer(customers);
-		openAccount(customer_id_fk);
+		customerIdFk = selectCustomer(customers);
+		openAccount(customerIdFk);
 	}
 
 	/**
-	 * @param customer_id_fk
+	 * Calls the Account DAO to create a new account for the specified customer
+	 * @param customerIdFk The customer's ID number
 	 */
-	private void openAccount(int customer_id_fk) {
+	private void openAccount(int customerIdFk) {
 		System.out.println("Enter type of account: ");
 		String account_type = scan.nextLine().strip();
 		System.out.println("Enter initial balance: ");
 		double balance = parseDecimalInput();
 
-		aDao.addAccount(new Account(customer_id_fk, account_type, balance));
+		aDao.addAccount(new Account(customerIdFk, account_type, balance));
 	}
 
 	/**
@@ -288,25 +347,25 @@ public class Menu {
 	 */
 	private void newCustomer() {
 		System.out.println("Enter new customer's first name: ");
-		String f_name = scan.nextLine().strip();
+		String fName = scan.nextLine().strip();
 		System.out.println("Enter new customer's last name: ");
-		String l_name = scan.nextLine().strip();
+		String lName = scan.nextLine().strip();
 		System.out.println("Enter new customer's street address: ");
-		String street_address = scan.nextLine().strip();
+		String streetAddress = scan.nextLine().strip();
 		System.out.println("Enter new customer's city: ");
 		String city = scan.nextLine().strip();
 		System.out.println("Enter new customer's state: ");
 		String state = scan.nextLine().strip();
 		//System.out.println("");
 		try {
-			ArrayList<Customer> duplicates = cDao.getCustomers(f_name, l_name, street_address, city, state);
+			ArrayList<Customer> duplicates = cDao.getCustomers(fName, lName, streetAddress, city, state);
 			if(duplicates.size() > 0) {
-				System.out.println("An account already exists for " + f_name + " " + l_name);
-				log.warn("User attempted to create a duplicate account: " + f_name + " " + l_name);
+				System.out.println("An account already exists for " + fName + " " + lName);
+				log.warn("User attempted to create a duplicate account: " + fName + " " + lName);
 			}
 			else {
-				cDao.createCustomer(new Customer(f_name, l_name, street_address, city, state));
-				log.info("User created new customer: " + f_name + " " + l_name); 
+				cDao.createCustomer(new Customer(fName, lName, streetAddress, city, state));
+				log.info("User created new customer: " + fName + " " + lName); 
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -332,14 +391,15 @@ public class Menu {
 	}
 
 	/**
+	 * Prompts the user to select a customer from a list of customers
 	 * @param customers the list of customers to be selected from
 	 * @return int The customer_id of the selected customer
 	 */
 	private int selectCustomer(ArrayList<Customer> customers) {
-		int customer_id = -1; //error code
+		int customerId = -1; //error code
 		if ((customers != null) && (customers.size() > 0)) {
 			if(customers.size() == 1) {
-				customer_id = customers.get(0).getCustomer_id();
+				customerId = customers.get(0).getCustomer_id();
 			}
 			else {
 				System.out.println("Select customer from the following:");
@@ -355,17 +415,17 @@ public class Menu {
 						System.out.println("Invalid selection. Please choose a customer from the list.");
 					}
 				} while(!valid);
-				customer_id = customers.get(selection).getCustomer_id();
+				customerId = customers.get(selection).getCustomer_id();
 			}
 		}
-		return customer_id;
+		return customerId;
 	}
 
 	private int selectAccount(ArrayList<Account> accounts) {
-		int customer_id = -1; //error code
+		int accountId = -1; //error code
 		if ((accounts != null) && (accounts.size() > 0)) {
 			if(accounts.size() == 1) {
-				customer_id = accounts.get(0).getAccount_id();
+				accountId = accounts.get(0).getAccount_id();
 			}
 			else {
 				System.out.println("Select account from the following:");
@@ -381,13 +441,15 @@ public class Menu {
 						System.out.println("Invalid selection. Please select an account from the list.");
 					}
 				} while(!valid);
-				customer_id = accounts.get(selection).getAccount_id();
+				accountId = accounts.get(selection).getAccount_id();
 			}
 		}
-		return customer_id;
+		return accountId;
 	}
 
 	/**
+	 * Prompts the user to enter a value and parses it out.
+	 * Repeats until a valid value is passed
 	 * @return double The value parsed from the user input
 	 */
 	private double parseDecimalInput() {
@@ -424,7 +486,8 @@ public class Menu {
 	}
 
 	/**
-	 * Parses out customer ID
+	 * Prompts user to input an integer value
+	 * Repeats until a valid value is passed
 	 * @return int customer id number, or -1 if error occurs
 	 */
 	private int parseIntegerInput() {
@@ -474,8 +537,7 @@ public class Menu {
 
 		System.out.println();
 	}
-
-
+	
 	/**
 	 * prints the menu text, moved to separate function
 	 * for aesthetic purposes

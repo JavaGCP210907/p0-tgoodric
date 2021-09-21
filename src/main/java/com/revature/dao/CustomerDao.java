@@ -180,9 +180,5 @@ public class CustomerDao implements ICustomerDao {
 		} catch (SQLException e) {
 			throw new SQLException("Failed to fetch customer id", e.getSQLState());
 		}
-		catch(IndexOutOfBoundsException e) {
-			System.out.println("If you are seeing this, fix your code on the getCustomerID function");
-			return 0;
-		}
 	}
 }
