@@ -6,7 +6,7 @@ import com.revature.models.Customer;
 
 public interface ICustomerDao {
 	
-	public void createCustomer(Customer customer) throws SQLException;
+	public int createCustomer(Customer customer) throws SQLException;
 	
 	public void closeAccount(int customer_id) throws SQLException;
 	

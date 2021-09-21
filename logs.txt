@@ -42,3 +42,13 @@
 2021-09-20 12:15:49 ERROR Menu:295 - Account list retrieval failed42703
 2021-09-20 12:17:11 ERROR Menu:295 - Account list retrieval failed42703
 2021-09-20 12:44:08 WARN  Menu:76 - Customer 24 accounts closed
+2021-09-21 09:41:00 INFO  Menu:368 - User created new customer: Fat Albert
+2021-09-21 09:42:19 WARN  Menu:194 - Customer 22 accounts closed
+2021-09-21 09:46:47 INFO  Menu:282 - Account 11 balance changed by -10000.0
+2021-09-21 09:47:43 INFO  Menu:282 - Account 7 balance changed by 10000.0
+2021-09-21 13:01:53 INFO  Menu:368 - User created new customer: Adam Jensen
+2021-09-21 13:48:44 INFO  Menu:288 - Account 1 balance changed by 100.0
+2021-09-21 13:49:33 ERROR Menu:296 - Error accessing account balance42601
+2021-09-21 13:52:53 ERROR Menu:296 - Error accessing account balance42601
+2021-09-21 13:56:57 ERROR Menu:296 - Error accessing account balance42601
+2021-09-21 15:24:48 WARN  Menu:301 - Customer 1 attempted to overdraw account 1

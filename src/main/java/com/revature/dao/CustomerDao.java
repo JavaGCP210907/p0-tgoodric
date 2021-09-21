@@ -21,8 +21,9 @@ public class CustomerDao implements ICustomerDao {
 	 * Adds a new customer to the database
 	 * 
 	 * @param Customer the customer to be added to the database
+	 * @return int The customer's ID number
 	 */
-	public void createCustomer(Customer customer) throws SQLException {
+	public int createCustomer(Customer customer) throws SQLException {
 		try(Connection conn = ConnectionUtil.getConnection()){
 			String sql = "insert into customers(f_name, l_name, street_address, city, state) " + //finish writing the damned
 						 "values (?, ?, ?, ?, ?)";												 //SQL query next time,
@@ -37,6 +38,8 @@ public class CustomerDao implements ICustomerDao {
 			
 			ps.executeUpdate();
 			
+			return getCustomerId(customer.getF_name(), customer.getL_name(), customer.getStreet_address(),
+				   customer.getCity(), customer.getState());
 		}
 		catch(SQLException e) {
 			throw new SQLException("Customer creation failed: " + customer.getF_name() + customer.getL_name());

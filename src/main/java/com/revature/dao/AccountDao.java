@@ -52,7 +52,25 @@ public class AccountDao implements IAccountDao {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public double getBalance(int customerId, int accountId) throws SQLException {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			ResultSet rs = null;
+			String sql = "select * from accounts where customer_id_fk = ? and account_id = ?";
+			
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, customerId);
+			ps.setInt(2, accountId);
+			
+			rs = ps.executeQuery();
+			ArrayList<Account> results = generateResults(rs);
+			return results.get(0).getBalance();
+		}
+		catch(SQLException e) {
+			throw new SQLException("Error accessing account balance", e.getSQLState());
+		}
+	}
+	
 	/**
 	 * Method used to alter the balance for the target account
 	 * @param account_id int The target account's unique identifier
@@ -62,6 +80,7 @@ public class AccountDao implements IAccountDao {
 	@Override
 	public void alterBalance(int account_id, double amount) throws SQLException { //completed
 		try(Connection conn = ConnectionUtil.getConnection()){
+			//double balance = 
 			String sql = "update accounts set balance = balance + ? where account_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setDouble(1, amount);

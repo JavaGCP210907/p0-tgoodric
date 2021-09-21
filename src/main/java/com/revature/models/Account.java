@@ -1,5 +1,8 @@
 package com.revature.models;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class Account {
 
 	//instance variables
@@ -7,6 +10,8 @@ public class Account {
 	private int customer_id_fk;
 	private String account_type;
 	private double balance;
+	NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("en", "US"));
+	
 	
 	
 	//ctors
@@ -79,8 +84,9 @@ public class Account {
 
 	@Override
 	public String toString() {
+		
 		return "Account [account_id=" + account_id + ", customer_id_fk=" + customer_id_fk + ", account_type="
-				+ account_type + ", balance=" + balance + "]";
+				+ account_type + ", balance=" + nf.format(balance) + "]";
 	}
 
 	/**

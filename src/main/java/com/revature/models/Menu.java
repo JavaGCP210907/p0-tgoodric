@@ -41,7 +41,7 @@ public class Menu {
 		switch(selection.toLowerCase()) { //TODO: Test all the functions
 		case "viewaccounts":{ //COMPLETED 09/18 2:21 PM
 			viewAccounts(); //extracted completed function for readability of switch
-			break;
+			break; //TODO: hit the toString() function to format the values to 2 decimal places
 		}//end case
 		case "viewcustomers":{//COMPLETED 09/17
 			viewCustomers(); //extracted for readability
@@ -79,6 +79,15 @@ public class Menu {
 			System.out.println("Terminating program.");
 			break;
 		}//end case
+		case "sandbox":{
+			
+			try {
+				System.out.println(aDao.getBalance(1,1));
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		default:{
 			System.out.println("Command \"" + selection + "\" not found");
 			System.out.println();
@@ -170,8 +179,19 @@ public class Menu {
 	private void deposit(String fName, String lName) {
 		int customerId = selectCustomer(fName, lName);
 		int accountId = -1;
+		ArrayList<Account> accounts = null;
+		try {
+			accounts = aDao.getAccounts(customerId);
+			accountId = selectAccount(accounts);
+		} 
+		catch (SQLException e) {
+			e.printStackTrace();
+			log.error(e.getMessage() + " " + e.getSQLState());
+		}		
 		double multiplier = 1.0;
-		alterBalance(customerId, accountId, multiplier);
+		if((customerId != -1) && (accountId != -1)) {
+			alterBalance(customerId, accountId, multiplier);
+		}
 	}
 
 	/**
@@ -265,36 +285,39 @@ public class Menu {
 	 * @param accountId The account whose balance is being changed
 	 * @param multiplier either 1 or -1 depending on deposit/withdrawal
 	 */
-	private void alterBalance(int customerId, int accountId, double multiplier) {
-		try {
-			ArrayList<Account> accounts = aDao.getAccounts(customerId);
-			accountId = selectAccount(accounts);
-		} catch (SQLException e) {
-			log.error(e.getMessage() + e.getSQLState());
-			e.printStackTrace();
-		}
+	private boolean alterBalance(int customerId, int accountId, double multiplier) {
 		if(accountId != -1) {
 			System.out.println("Enter amount: ");
 			double amount = parseDecimalInput();
 
 			try {
-				aDao.alterBalance(accountId, (multiplier * amount));
-				log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
+				   //deposits can't overdraw, withdrawing a smaller amount than balance won't either
+				if((multiplier > 0.0 ) || (amount < aDao.getBalance(customerId, accountId))){
+								aDao.alterBalance(accountId, (multiplier * amount));
+								log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
+								return true;
+				}
+				else {
+					log.warn("Customer " + customerId + " attempted to overdraw account " + accountId);
+					return false;
+				}
 			} catch (SQLException e) {
 				log.error(e.getMessage() + e.getSQLState());
 				e.printStackTrace();
+				return false;
 			}
 		}
 		else {
 			System.out.println("Account not found.");
 			log.warn("User selected invalid account for transaction");
+			return false;
 		}
 	}
 
 	/**
 	 * @param fName
 	 * @param lName
-	 * @return
+	 * @return int The customer's ID number
 	 */
 	private int selectCustomer(String fName, String lName) {
 		ArrayList<Customer> results = null;
@@ -364,8 +387,9 @@ public class Menu {
 				log.warn("User attempted to create a duplicate account: " + fName + " " + lName);
 			}
 			else {
-				cDao.createCustomer(new Customer(fName, lName, streetAddress, city, state));
+				int newCustomerId = cDao.createCustomer(new Customer(fName, lName, streetAddress, city, state));
 				log.info("User created new customer: " + fName + " " + lName); 
+				openAccount(newCustomerId);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
