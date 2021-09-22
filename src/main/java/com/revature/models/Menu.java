@@ -38,10 +38,10 @@ public class Menu {
 	 */
 	private boolean menuLogic(String selection){
 		//boolean newCustomerFlag = false;
-		switch(selection.toLowerCase()) { //TODO: Test all the functions
+		switch(selection.toLowerCase()) { 
 		case "viewaccounts":{ //COMPLETED 09/18 2:21 PM
 			viewAccounts(); //extracted completed function for readability of switch
-			break; //TODO: hit the toString() function to format the values to 2 decimal places
+			break; 
 		}//end case
 		case "viewcustomers":{//COMPLETED 09/17
 			viewCustomers(); //extracted for readability
@@ -146,11 +146,13 @@ public class Menu {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		double amount = 0.0;
+		System.out.println("Enter amount to be transferred: ");
+		double amount = parseDecimalInput();
+		System.out.println(amount);
 		if((sourceAccountId != -1) && (targetAccountId != -1)) {		
-			boolean successful = alterBalance(sourceId, sourceAccountId, amount * -1.0);
+			boolean successful = alterBalance(sourceId, sourceAccountId, -1, amount);
 				if(successful) {
-					alterBalance(targetId, targetAccountId, amount);
+					alterBalance(targetId, targetAccountId, 1, amount);
 				}
 		}
 		else {
@@ -233,6 +235,7 @@ public class Menu {
 	 * Displays account info for customer
 	 */
 	private void viewAccountInfo() {
+		viewCustomers();
 		System.out.println("Enter the first name of the customer whose account info you want to view: ");
 		String fName = scan.nextLine().strip();
 		System.out.println("Enter the last name of the customer whose account info you want to view: ");
@@ -254,6 +257,7 @@ public class Menu {
 				}
 				System.out.printf("Total Balance: $%.2f", totalBalance);
 				System.out.println();
+				System.out.println("===================================");
 				//add balance available for each account to total balance, print
 			}
 			else {
@@ -277,26 +281,37 @@ public class Menu {
 			System.out.println("Enter amount: ");
 			double amount = parseDecimalInput();
 
-			try {
-				   //deposits can't overdraw, withdrawing a smaller amount than balance won't either
-				if((multiplier > 0.0 ) || (amount < aDao.getBalance(accountId))){
-								aDao.alterBalance(accountId, (multiplier * amount));
-								log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
-								return true;
-				}
-				else {
-					log.warn("Customer " + customerId + " attempted to overdraw account " + accountId);
-					return false;
-				}
-			} catch (SQLException e) {
-				log.error(e.getMessage() + e.getSQLState());
-				e.printStackTrace();
-				return false;
-			}
+			return alterBalance(customerId, accountId, multiplier, amount);
 		}
 		else {
 			System.out.println("Account not found.");
 			log.warn("User selected invalid account for transaction");
+			return false;
+		}
+	}
+
+	/**
+	 * @param customerId
+	 * @param accountId
+	 * @param multiplier
+	 * @param amount
+	 * @return
+	 */
+	private boolean alterBalance(int customerId, int accountId, double multiplier, double amount) {
+		try {
+			   //deposits can't overdraw, withdrawing a smaller amount than balance won't either
+			if((multiplier > 0.0 ) || (amount < aDao.getBalance(accountId))){
+							aDao.alterBalance(accountId, (multiplier * amount));
+							log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
+							return true;
+			}
+			else {
+				log.warn("Customer " + customerId + " attempted to overdraw account " + accountId);
+				return false;
+			}
+		} catch (SQLException e) {
+			log.error(e.getMessage() + e.getSQLState());
+			e.printStackTrace();
 			return false;
 		}
 	}

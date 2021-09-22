@@ -53,3 +53,16 @@
 2021-09-21 13:56:57 ERROR Menu:296 - Error accessing account balance42601
 2021-09-21 15:24:48 WARN  Menu:301 - Customer 1 attempted to overdraw account 1
 2021-09-21 17:23:44 WARN  Menu:291 - Customer 1 attempted to overdraw account 1
+2021-09-22 09:15:58 INFO  Menu:378 - User created new customer: Fat Albert
+2021-09-22 09:17:12 WARN  Menu:205 - Invalid customer selection: -1
+2021-09-22 09:17:40 WARN  Menu:201 - Customer 27 accounts closed
+2021-09-22 09:19:09 INFO  Menu:284 - Account 26 balance changed by -0.0
+2021-09-22 09:19:27 WARN  Menu:288 - Customer 1 attempted to overdraw account 1
+2021-09-22 09:22:04 INFO  Menu:286 - Account 7 balance changed by -0.0
+2021-09-22 09:22:22 INFO  Menu:286 - Account 1 balance changed by 0.0
+2021-09-22 09:25:09 INFO  Menu:286 - Account 6 balance changed by -1.0E11
+2021-09-22 09:25:24 INFO  Menu:286 - Account 1 balance changed by 0.0
+2021-09-22 09:41:12 INFO  Menu:304 - Account 8 balance changed by -1000000.0
+2021-09-22 09:41:12 INFO  Menu:304 - Account 1 balance changed by 1000000.0
+2021-09-22 09:42:18 INFO  Menu:304 - Account 1 balance changed by -1000000.0
+2021-09-22 09:42:18 INFO  Menu:304 - Account 8 balance changed by 1000000.0
