@@ -123,7 +123,7 @@ public class Menu {
 		String sourceFirstName = scan.nextLine();
 		System.out.println("Enter last name of source customer: ");
 		String sourceLastName = scan.nextLine();	
-		
+
 		int sourceId = selectCustomer(sourceFirstName, sourceLastName);
 		int sourceAccountId = -1; //error code, will be changed if data retrieval is successful
 		try {
@@ -132,7 +132,7 @@ public class Menu {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		//note no constraints on allowing same customer
 		System.out.println("enter first Name of target customer: ");
 		String targetFirstName = scan.nextLine();
@@ -151,9 +151,9 @@ public class Menu {
 		System.out.println(amount);
 		if((sourceAccountId != -1) && (targetAccountId != -1)) {		
 			boolean successful = alterBalance(sourceId, sourceAccountId, -1, amount);
-				if(successful) {
-					alterBalance(targetId, targetAccountId, 1, amount);
-				}
+			if(successful) {
+				alterBalance(targetId, targetAccountId, 1, amount);
+			}
 		}
 		else {
 			log.warn("An invalid customer was selected for an internal transfer");
@@ -299,11 +299,11 @@ public class Menu {
 	 */
 	private boolean alterBalance(int customerId, int accountId, double multiplier, double amount) {
 		try {
-			   //deposits can't overdraw, withdrawing a smaller amount than balance won't either
+			//deposits can't overdraw, withdrawing a smaller amount than balance won't either
 			if((multiplier > 0.0 ) || (amount < aDao.getBalance(accountId))){
-							aDao.alterBalance(accountId, (multiplier * amount));
-							log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
-							return true;
+				aDao.alterBalance(accountId, (multiplier * amount));
+				log.info("Account " + accountId + " balance changed by " + (multiplier * amount));
+				return true;
 			}
 			else {
 				log.warn("Customer " + customerId + " attempted to overdraw account " + accountId);
@@ -349,9 +349,13 @@ public class Menu {
 			log.error(e.getMessage() + " " + e.getSQLState());
 			e.printStackTrace();
 		}
-
 		customerIdFk = selectCustomer(customers);
-		openAccount(customerIdFk);
+		if(customerIdFk != -1) {
+			openAccount(customerIdFk);
+		}
+		else {
+			log.warn("User attempted to create an account for a nonexistent customer");
+		}
 	}
 
 	/**
@@ -365,6 +369,7 @@ public class Menu {
 		double balance = parseDecimalInput();
 
 		aDao.addAccount(new Account(customerIdFk, account_type, balance));
+		log.info("A new account was created for " + customerIdFk);
 	}
 
 	/**
@@ -392,6 +397,7 @@ public class Menu {
 				int newCustomerId = cDao.createCustomer(new Customer(fName, lName, streetAddress, city, state));
 				log.info("User created new customer: " + fName + " " + lName); 
 				openAccount(newCustomerId);
+				
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -563,7 +569,7 @@ public class Menu {
 
 		System.out.println();
 	}
-	
+
 	/**
 	 * prints the menu text, moved to separate function
 	 * for aesthetic purposes

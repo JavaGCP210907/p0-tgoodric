@@ -66,3 +66,8 @@
 2021-09-22 09:41:12 INFO  Menu:304 - Account 1 balance changed by 1000000.0
 2021-09-22 09:42:18 INFO  Menu:304 - Account 1 balance changed by -1000000.0
 2021-09-22 09:42:18 INFO  Menu:304 - Account 8 balance changed by 1000000.0
+2021-09-22 14:13:08 INFO  Menu:393 - User created new customer: Karen Person
+2021-09-22 14:23:09 WARN  Menu:357 - User attempted to create an account for a nonexistent customer
+2021-09-22 14:27:15 INFO  Menu:398 - User created new customer: Lisa Simpson
+2021-09-22 14:27:24 INFO  Menu:372 - A new account was created for 29
+2021-09-22 14:27:37 WARN  Menu:203 - Customer 29 accounts closed
